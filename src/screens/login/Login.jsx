@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   SafeAreaView,
@@ -10,21 +10,38 @@ import {
   TextInput,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
-// import { StackTypes } from "../../routes/stack";
+import api from "./../../services/api"
 
 const showP = require("./../../assets/img/openP.png");
 const offP = require("./../../assets/img/offP.png");
 
 export default function Login() {
+  // Usando useState para armazenar os dados dos usuários
+  const [users, setUsers] = useState([]);
+
+  // Função para buscar os usuários da API
+  async function getUsers() {
+    try {
+      const response = await api.get('/usuarios'); 
+      // console.log(response) // API request
+      setUsers(response.data); // Atualiza o estado com os dados recebidos
+      // console.log(response.data); // Exibe no console os dados dos usuários
+      console.log('VOU MOSTRAR O STATE DE USERS')
+      console.log(users);
+      // console.log(users[0]);
+      // console.log(users[1]);
+      
+      console.log('MOSTREI O STATE DE USERS')
+    } catch (error) {
+      console.error("Erro ao buscar usuários:", error);
+    }
+  }
+
   const navigation = useNavigation();
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [senha, setSenha] = useState("");
   const [email, setEmail] = useState("");
-  // const [form, setForm] = useState({
-  //   email: "",
-  //   password: "",
-  // });
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#e8ecf4" }}>
       <KeyboardAwareScrollView style={styles.container}>
@@ -39,17 +56,18 @@ export default function Login() {
         <View style={styles.form}>
           <View style={styles.input}>
             <Text style={styles.inputLabel}>Email ou CPF</Text>
-
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              clearButtonMode="while-editing"
-              onChangeText={setEmail}
-              placeholder="john@example.com"
-              placeholderTextColor="#6b7280"
-              style={styles.inputControl}
-              value={email}
-            />
+            <View style={styles.inputView}>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                clearButtonMode="while-editing"
+                onChangeText={setEmail}
+                placeholder="john@example.com"
+                placeholderTextColor="#6b7280"
+                style={styles.inputControl}
+                value={email}
+              />
+            </View>
           </View>
 
           <View style={styles.input}>
@@ -58,20 +76,21 @@ export default function Login() {
               <TextInput
                 autoCapitalize="none"
                 autoCorrect={false}
-                clearButtonMode="while-editing"
                 placeholder="********"
                 placeholderTextColor="#6b7280"
                 style={styles.inputControl}
                 secureTextEntry={!senhaVisivel}
-                value={senha}
                 onChangeText={setSenha}
+                value={senha}
               />
-
               <TouchableOpacity
                 onPress={() => setSenhaVisivel(!senhaVisivel)}
                 style={styles.showPasswordButton}
               >
-                <Image source={senhaVisivel ? showP : offP} />
+                <Image
+                  source={senhaVisivel ? showP : offP}
+                  style={styles.showPasswordIcon}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -79,16 +98,9 @@ export default function Login() {
           <View style={styles.formAction}>
             <TouchableOpacity
               onPress={() => {
-                if(email == "teste@123" && senha == "123"){
-                  navigation.navigate("TabComponent");
-
-                }
-                else{
-                  alert("Senha ou email errados")
-                }
-                // NavigationHelpersContext.
-                // navigation.navigate("Main")
-                // NavigationHelpersContext.n
+                // Chama a função para pegar os usuários
+                getUsers();
+                // console.log(users)
               }}
             >
               <View style={styles.btn}>
@@ -110,7 +122,6 @@ export default function Login() {
       <TouchableOpacity
         onPress={() => {
           navigation.navigate("Cadastrar");
-          // handle link
         }}
       >
         <Text style={styles.formFooter}>
@@ -237,4 +248,38 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 10,
   },
+  input: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 17,
+    fontWeight: "600",
+    color: "#222",
+    marginBottom: 8,
+  },
+  inputView: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    height: 50,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#C9D3DB",
+    paddingHorizontal: 10,
+  },
+  inputControl: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#222",
+  },
+  showPasswordButton: {
+    padding: 10,
+  },
+  showPasswordIcon: {
+    width: 20,
+    height: 20,
+  },
+  
+
 });

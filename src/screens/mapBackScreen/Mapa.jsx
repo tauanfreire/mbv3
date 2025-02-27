@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Keyboard } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Keyboard} from "react-native";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
@@ -7,6 +7,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 // import type { GooglePlacesAutocompleteRef } from "react-native-google-places-autocomplete";
 import Geocoder from "react-native-geocoding";
 import { LocationUserContext } from "../../Context/LocationUserContext";
+
 
 const API_KEY = "AIzaSyCG5Vk7f38ESS4x3BN1ezz0oJJP08rAkCM";
 Geocoder.init(API_KEY);
@@ -32,8 +33,8 @@ export default function Mapa() {
   const [distancia, setDistancia] = useState();
   const [duracao, setDuracao] = useState();
 
-  const [showOrigem, setShowOrigem] = useState(true); // Estado para controlar visibilidade do campo Origem
-  const [showDestino, setShowDestino] = useState(true); // Estado para controlar visibilidade do campo Destino
+  const [focusOrigem, setFocusOrigem] = useState(false); // Estado para controlar visibilidade do campo Origem
+  const [focusDestino, setFocusDestino] = useState(false); // Estado para controlar visibilidade do campo Destino
 
   const formatarDinheiro = (valor) => {
     return `R$ ${parseFloat(valor).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -105,36 +106,42 @@ export default function Mapa() {
       </MapView>
       <View style={styles.tudo}>
         <View style={styles.top}>
-          {showOrigem && (
+          <View style={{width: "80%", height: 200, margin: "auto", opacity: 0.9}}> 
+  
+
             <GooglePlacesAutocomplete
+              style={{backgroundColor: "blue"}}
               placeholder={origemAtual}
               ref={autoCompleteRef}
               onPress={(data) => {
                 setOrigemAtual(data.description);
-                setShowDestino(true); // Mostra o destino ao selecionar origem
+             
+                // setShowDestino(true); // Mostra o destino ao selecionar origem
               }}
               query={{
                 key: API_KEY,
                 language: "pt-BR",
               }}
-              onFocus={() => setShowDestino(false)} // Oculta o destino ao focar no campo origem
             />
-          )}
-
-          {showDestino && (
             <GooglePlacesAutocomplete
               placeholder={destinoAtual}
               onPress={(data) => {
                 setDestinoAtual(data.description);
-                setShowOrigem(true); // Mostra a origem ao selecionar destino
+                // setShowOrigem(true); // Mostra a origem ao selecionar destino
               }}
               query={{
                 key: API_KEY,
                 language: "pt-BR",
               }}
-              onFocus={() => setShowOrigem(false)} // Oculta a origem ao focar no campo destino
             />
-          )}
+          </View>
+
+          <View style={{width: "80%"}}>
+            
+          </View>
+
+
+
         </View>
         <View style={styles.bottom}>
           <View style={styles.caixaPreco}>
@@ -236,12 +243,23 @@ const styles = StyleSheet.create({
   tudo: {
     flex: 1,
     justifyContent: "space-between",
+    // backgroundColor: "blue",
   },
   top: {
-    marginTop: 40,
-    height: 150,
-    width: "80%",
-    margin: "auto",
+    // backgroundColor: "red", 
     justifyContent: "center",
+    alignItems: "center",
+    marginTop: 50, // Apenas para visualização
+    width: "90%",
+    margin: "auto",
+    // height: 200
+    // marginTop: 20, // Adicionando um espaço entre o topo da tela
   },
+  
 });
+
+const autoCompleteStyles = {
+  backgroundColor: "blue",
+  // container: { flex: 0, width: "100%" },
+  // textInput: { height: 50, fontSize: 16 },
+};

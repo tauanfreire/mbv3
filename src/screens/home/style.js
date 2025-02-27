@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     image:{
         flex: 1,
         // backgroundColor: "#e8ecf4"
-        backgroundColor: "white"
+        backgroundColor: "white",
         
         // opacity: 0.1
     },

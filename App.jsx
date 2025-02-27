@@ -9,9 +9,6 @@ import StackComponent from "./src/routes/stack";
 
 import * as Location from "expo-location";
 
-// Criando o Stack Navigator
-const Stack = createStackNavigator();
-
 export default function App() {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);

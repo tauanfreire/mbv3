@@ -1,40 +1,60 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
+import { FontAwesome } from "@expo/vector-icons";
 import {
   StyleSheet,
-  SafeAreaView,
   View,
-  Image,
   Text,
   TouchableOpacity,
   TextInput,
+  Image,
 } from "react-native";
-// import { StackTypes } from "../../../routes/stack";
 
-const showP = require("./../../../assets/img/openP.png")
-const offP = require("./../../../assets/img/offP.png")
-
-
+const showP = require("./../../../assets/img/openP.png");
+const offP = require("./../../../assets/img/offP.png");
 
 export default function Senha() {
-  const navigation = useNavigation()
-
+  const navigation = useNavigation();
   const [senhaVisivel, setSenhaVisivel] = useState(false);
-  const [senha, setSenha] = useState('');
-  const [form, setForm] = useState({
-    nome: "",
-    email: "taua",
-    cpf: "",
-    dataNascimento: "",
-    numeroTelefone: "",
+  const [senha, setSenha] = useState("");
+  const [validacoes, setValidacoes] = useState({
+    tamanho: null,
+    maiuscula: null,
+    numero: null,
+    especial: null,
+    espaco: null,
   });
+
+  function verificarSenha(e) {
+    // Remove espaços em branco automaticamente
+    const senhaSemEspaco = e.replace(/\s/g, "");
+  
+    setSenha(senhaSemEspaco);  // Atualiza a senha sem espaços
+    setValidacoes({
+      tamanho: senhaSemEspaco.length >= 8,
+      maiuscula: /[A-Z]/.test(senhaSemEspaco),
+      numero: /\d/.test(senhaSemEspaco),
+      especial: /[!@#$%^&*(),.?":{}|<>]/.test(senhaSemEspaco),
+      espaco: !/\s/.test(senhaSemEspaco),
+    });
+  }
+  
+
+  function getIcon(status) {
+    if (status === null) return null;
+    return status ? (
+      <FontAwesome name="check-circle" size={18} color="green" />
+    ) : (
+      <FontAwesome name="times-circle" size={18} color="red" />
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>
           Cadastrar no <Text style={{ color: "#075eec" }}>MobCocais</Text>
         </Text>
-
         <Text style={styles.subtitle}>
           Crie uma senha para ter acesso ao MobCocais
         </Text>
@@ -44,49 +64,53 @@ export default function Senha() {
         <View style={styles.form}>
           <View style={styles.input}>
             <Text style={styles.inputLabel}>Senha</Text>
-
             <View style={styles.inputView}>
-              
               <TextInput
                 autoCapitalize="none"
                 autoCorrect={false}
-                clearButtonMode="while-editing"
                 placeholder="********"
                 placeholderTextColor="#6b7280"
                 style={styles.inputControl}
                 secureTextEntry={!senhaVisivel}
                 value={senha}
-                onChangeText={setSenha}
+                onChangeText={verificarSenha}
               />
-
               <TouchableOpacity
                 onPress={() => setSenhaVisivel(!senhaVisivel)}
                 style={styles.showPasswordButton}
-                >
-                <Image source={senhaVisivel? showP: offP}/>
-
+              >
+                <Image source={senhaVisivel ? showP : offP} style={styles.showPasswordIcon} />
               </TouchableOpacity>
             </View>
-            <Text style={styles.subtitle}>Use letras maíusculas e números</Text>
+            <View style={styles.validationContainer}>
+              <View style={styles.validationItem}>
+                {getIcon(validacoes.tamanho)}
+                <Text> Pelo menos 8 caracteres</Text>
+              </View>
+              <View style={styles.validationItem}>
+                {getIcon(validacoes.maiuscula)}
+                <Text> Pelo menos 1 letra maiúscula</Text>
+              </View>
+              <View style={styles.validationItem}>
+                {getIcon(validacoes.numero)}
+                <Text> Pelo menos 1 número</Text>
+              </View>
+              <View style={styles.validationItem}>
+                {getIcon(validacoes.especial)}
+                <Text> Pelo menos 1 caractere especial (!@#$...)</Text>
+              </View>
+            </View>
           </View>
 
           <View style={styles.formAction}>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('CadastrarCartao')
-              }}
-            >
+            <TouchableOpacity onPress={() => navigation.navigate("CadastrarCartao")}>
               <View style={styles.btn}>
                 <Text style={styles.btnText}>Continuar</Text>
               </View>
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('Login')
-            }}
-          >
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
             <Text style={styles.formLink}>Já tem uma conta? Faça o login</Text>
           </TouchableOpacity>
         </View>
@@ -112,40 +136,19 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#929292",
   },
-  /** Header */
   header: {
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 36,
     marginTop: 100,
   },
-  headerImg: {
-    width: 80,
-    height: 80,
-    alignSelf: "center",
-    marginBottom: 36,
+  formV: {
+    flex: 1,
+    justifyContent: "center",
   },
   form: {
     marginBottom: 24,
     paddingHorizontal: 24,
-  },
-  formAction: {
-    marginTop: 4,
-    marginBottom: 16,
-  },
-  formLink: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#075eec",
-    textAlign: "center",
-  },
-  formFooter: {
-    paddingVertical: 24,
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#222",
-    textAlign: "center",
-    letterSpacing: 0.15,
   },
   input: {
     marginBottom: 16,
@@ -156,31 +159,36 @@ const styles = StyleSheet.create({
     color: "#222",
     marginBottom: 8,
   },
-  inputControl: {
-    height: 50,
+  inputView: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#fff",
-    paddingHorizontal: 16,
+    height: 50,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#C9D3DB",
+    paddingHorizontal: 10,
+  },
+  inputControl: {
+    flex: 1,
     fontSize: 15,
     fontWeight: "500",
     color: "#222",
-    borderWidth: 1,
-    borderColor: "#C9D3DB",
-    borderStyle: "solid",
-    width: "100%"
   },
-  inputView: {
+  showPasswordButton: {
+    padding: 10,
+  },
+  showPasswordIcon: {
+    width: 20,
+    height: 20,
+  },
+  validationContainer: {
+    marginTop: 10,
+  },
+  validationItem: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#fff",
-    height: 50,
-    marginRight: 10,
-
-    borderRadius: 12,
-    fontSize: 15,
-    color: "#222",
-    borderColor: "#C9D3DB",
-    borderStyle: "solid",
+    alignItems: "center",
+    marginBottom: 5,
   },
   btn: {
     flexDirection: "row",
@@ -195,16 +203,18 @@ const styles = StyleSheet.create({
   },
   btnText: {
     fontSize: 18,
-    lineHeight: 26,
     fontWeight: "600",
     color: "#fff",
   },
-  formV: {
-    flex: 1,
-    justifyContent: "center",
+  formAction: {
+    marginTop: 4,
+    marginBottom: 16,
   },
-  showPasswordButton:{
-    justifyContent: "center",
-    marginRight: 10
-  }
+  formLink: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#075eec",
+    textAlign: "center",
+  },
 });
+
