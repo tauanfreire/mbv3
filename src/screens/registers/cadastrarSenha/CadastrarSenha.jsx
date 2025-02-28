@@ -8,10 +8,17 @@ import {
   TouchableOpacity,
   TextInput,
   Image,
+  Alert,
 } from "react-native";
+
+// var bcrypt = require('bcryptjs');
+import bcrypt from 'react-native-bcrypt';
+var salt = bcrypt.genSaltSync(10);
 
 const showP = require("./../../../assets/img/openP.png");
 const offP = require("./../../../assets/img/offP.png");
+
+import api from "../../../services/api";
 
 export default function Senha() {
   const navigation = useNavigation();
@@ -25,6 +32,24 @@ export default function Senha() {
     espaco: null,
   });
 
+  async function cadastrarSenha(){
+    try {
+      console.log("entrei no tyr");
+
+      console.log(senha);
+      var hash = bcrypt.hashSync(senha, salt);
+      console.log(senha); 
+      
+      await api.put(`usuarios/${'67c112704281e892755ff92c'}`, {
+        senha: hash
+      })
+      Alert.alert("Senha atualizada com sucesso")
+      // navigation.navigate('CadastrarCartao')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   function verificarSenha(e) {
     // Remove espaços em branco automaticamente
     const senhaSemEspaco = e.replace(/\s/g, "");
@@ -37,6 +62,13 @@ export default function Senha() {
       especial: /[!@#$%^&*(),.?":{}|<>]/.test(senhaSemEspaco),
       espaco: !/\s/.test(senhaSemEspaco),
     });
+
+    
+    // var bcryptVar = require('bcryptjs');
+    // var has = bcryptVar.
+    
+    // const hashSenha = await bcrypt.hash(senha, 10)
+    console.log(senha);
   }
   
 
@@ -103,11 +135,37 @@ export default function Senha() {
           </View>
 
           <View style={styles.formAction}>
-            <TouchableOpacity onPress={() => navigation.navigate("CadastrarCartao")}>
+            <TouchableOpacity onPress={() =>{
+              // if(validacoes.espaco == null || validacoes.especial == null || validacoes.maiuscula == null || validacoes.numero == null || validacoes.tamanho == null){
+              // }
+              for(let validacao in validacoes){
+                if(validacoes[validacao] == false){
+                  Alert.alert("Cumpra todos os requsitots da senha!")
+                  break
+
+                }
+                else{
+                  cadastrarSenha()
+                  // Load hash from your password DB.
+                  var h = '$2a$10$opOJ44oOEscE1rIFQjnDF.fVBagfD4SpkLu0/.G21t5ekXGbxjbpK'
+                  console.log(bcrypt.compareSync(senha, h)) // true
+                  bcrypt.compareSync("not_bacon", h); // false
+                  // navigation.navigate('CadastrarCartao')
+                }
+                // console.log(validacao + validacoes[validacao]);
+                
+              }
+              // validacoes.espaco ? 
+                  console.log(senha);
+
+                  // var hash = bcrypt.hashSync(senha, salt);
+                  // console.log(senha);
+            }}>
               <View style={styles.btn}>
                 <Text style={styles.btnText}>Continuar</Text>
               </View>
             </TouchableOpacity>
+   
           </View>
 
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>

@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import api from "./../../services/api"
@@ -100,6 +101,18 @@ export default function Login() {
               onPress={() => {
                 // Chama a função para pegar os usuários
                 getUsers();
+                users.map((user) =>{
+                  if(user.email == email && user.senha == senha){
+                    Alert.alert("Parabéns!", `Você é o usário ${user.nome}`)
+                    navigation.navigate("TabComponent");
+                  }
+                  else{
+                    Alert.alert("Atenção", "Email ou Senha errados!")
+
+                  }
+                  // console.log(user.email);
+                  
+                })
                 // console.log(users)
               }}
             >

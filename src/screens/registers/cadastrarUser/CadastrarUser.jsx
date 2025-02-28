@@ -372,7 +372,7 @@ export default function Cadastrar() {
                   createUser()
                   // navigation.navigate("CriarSenha");
                 }
-                // navigation.navigate("CriarSenha");
+                navigation.navigate("CriarSenha");
               }}
             >
               <View style={styles.btn}>
