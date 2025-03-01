@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
+import { RouteProp, useRoute } from "@react-navigation/native";
 import {
   StyleSheet,
   View,
@@ -12,7 +13,7 @@ import {
 } from "react-native";
 
 // var bcrypt = require('bcryptjs');
-import bcrypt from 'react-native-bcrypt';
+import bcrypt from "react-native-bcrypt";
 var salt = bcrypt.genSaltSync(10);
 
 const showP = require("./../../../assets/img/openP.png");
@@ -21,6 +22,40 @@ const offP = require("./../../../assets/img/offP.png");
 import api from "../../../services/api";
 
 export default function Senha() {
+
+  useEffect(() =>{
+    setUsuario({
+      nome: name,
+      email: email,
+      cpf: cpf,
+      numeroTelefone: numberPhone,
+      dataNascimento: dataNasc,
+      senha: senha
+    })
+    console.log("ENTREI NO USE EFECT")
+    console.log("SENHA: " + senha);
+    console.log("CPF : " + usuario.cpf)
+    console.log("NOME : " + usuario.nome)
+    console.log(usuario.dataNascimento)
+    console.log(usuario.numeroTelefone)
+    console.log(usuario.email)
+    console.log("SAI DO USE EFECT")
+  }, [senha])
+  
+  
+  const route = useRoute();
+  const { name, email, cpf, numberPhone, dataNasc } = route.params;
+  const [usuario, setUsuario] = useState({
+    nome: name,
+    email: email,
+    cpf: cpf,
+    numeroTelefone: numberPhone,
+    dataNascimento: dataNasc,
+    senha: null
+  })
+  // const usuario = {
+
+  // const [origemAtual, setOrigemAtual] = useState(origem);
   const navigation = useNavigation();
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [senha, setSenha] = useState("");
@@ -32,29 +67,30 @@ export default function Senha() {
     espaco: null,
   });
 
-  async function cadastrarSenha(){
+  async function cadastrarSenha() {
     try {
       console.log("entrei no tyr");
 
       console.log(senha);
       var hash = bcrypt.hashSync(senha, salt);
-      console.log(senha); 
-      
-      await api.put(`usuarios/${'67c112704281e892755ff92c'}`, {
-        senha: hash
-      })
-      Alert.alert("Senha atualizada com sucesso")
+      console.log(senha);
+
+      await api.put(`usuarios/${"67c112704281e892755ff92c"}`, {
+        senha: hash,
+      });
+      setSenha(hash)
+      Alert.alert("Senha atualizada com sucesso");
       // navigation.navigate('CadastrarCartao')
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
   function verificarSenha(e) {
     // Remove espaços em branco automaticamente
     const senhaSemEspaco = e.replace(/\s/g, "");
-  
-    setSenha(senhaSemEspaco);  // Atualiza a senha sem espaços
+
+    setSenha(senhaSemEspaco); // Atualiza a senha sem espaços
     setValidacoes({
       tamanho: senhaSemEspaco.length >= 8,
       maiuscula: /[A-Z]/.test(senhaSemEspaco),
@@ -63,14 +99,12 @@ export default function Senha() {
       espaco: !/\s/.test(senhaSemEspaco),
     });
 
-    
     // var bcryptVar = require('bcryptjs');
     // var has = bcryptVar.
-    
+
     // const hashSenha = await bcrypt.hash(senha, 10)
     console.log(senha);
   }
-  
 
   function getIcon(status) {
     if (status === null) return null;
@@ -111,7 +145,10 @@ export default function Senha() {
                 onPress={() => setSenhaVisivel(!senhaVisivel)}
                 style={styles.showPasswordButton}
               >
-                <Image source={senhaVisivel ? showP : offP} style={styles.showPasswordIcon} />
+                <Image
+                  source={senhaVisivel ? showP : offP}
+                  style={styles.showPasswordIcon}
+                />
               </TouchableOpacity>
             </View>
             <View style={styles.validationContainer}>
@@ -135,37 +172,46 @@ export default function Senha() {
           </View>
 
           <View style={styles.formAction}>
-            <TouchableOpacity onPress={() =>{
-              // if(validacoes.espaco == null || validacoes.especial == null || validacoes.maiuscula == null || validacoes.numero == null || validacoes.tamanho == null){
-              // }
-              for(let validacao in validacoes){
-                if(validacoes[validacao] == false){
-                  Alert.alert("Cumpra todos os requsitots da senha!")
-                  break
+            <TouchableOpacity
+              onPress={() => {
+                cadastrarSenha()
+                navigation.navigate("CadastrarCartao", {usuario});
+                // if(validacoes.espaco == null || validacoes.especial == null || validacoes.maiuscula == null || validacoes.numero == null || validacoes.tamanho == null){
+                // }
+                // for (let validacao in validacoes) {
+                //   if (validacoes[validacao] == false) {
+                //     Alert.alert("Cumpra todos os requsitots da senha!");
+                //     break;
+                //   } else {
+                //     cadastrarSenha();
+                //     // // Load hash from your password DB.
+                //     // var h =
+                //     //   "$2a$10$opOJ44oOEscE1rIFQjnDF.fVBagfD4SpkLu0/.G21t5ekXGbxjbpK";
+                //     // console.log(bcrypt.compareSync(senha, h)); // true
+                //     // bcrypt.compareSync("not_bacon", h); // false
+                //     // navigation.navigate('CadastrarCartao')
+                //   }
+                  // console.log(validacao + validacoes[validacao]);
+                // }
+                // validacoes.espaco ?
+                // console.log(senha);
+                // console.log(usuario.cpf)
+                // console.log(usuario.nome)
+                // console.log(usuario.dataNascimento)
+                // console.log(usuario.numeroTelefone)
+                // console.log(usuario.email)
+                // for(let dado in usuario){
+                //   console.log(usuario[dado])
+                // }
 
-                }
-                else{
-                  cadastrarSenha()
-                  // Load hash from your password DB.
-                  var h = '$2a$10$opOJ44oOEscE1rIFQjnDF.fVBagfD4SpkLu0/.G21t5ekXGbxjbpK'
-                  console.log(bcrypt.compareSync(senha, h)) // true
-                  bcrypt.compareSync("not_bacon", h); // false
-                  // navigation.navigate('CadastrarCartao')
-                }
-                // console.log(validacao + validacoes[validacao]);
-                
-              }
-              // validacoes.espaco ? 
-                  console.log(senha);
-
-                  // var hash = bcrypt.hashSync(senha, salt);
-                  // console.log(senha);
-            }}>
+                // var hash = bcrypt.hashSync(senha, salt);
+                // console.log(senha);
+              }}
+            >
               <View style={styles.btn}>
                 <Text style={styles.btnText}>Continuar</Text>
               </View>
             </TouchableOpacity>
-   
           </View>
 
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
@@ -275,4 +321,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,15 +14,23 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 // import { StackTypes } from "../../../routes/stack";
 
 export default function CadastrarCartao() {
+  const route = useRoute();
+  const {usuario} = route.params
   const navigation = useNavigation();
   const [titular, setTitular] = useState("");
   const [numberCard, setNumberCard] = useState("");
   const [validaade, setValidade] = useState("");
   const [cvv, setCvv] = useState("");
+
+  useEffect(()=>{
+    console.log(usuario)
+    console.log("NOME DO USUARIO NA TELA DO CARTÃO É: " + usuario.nome)
+    console.log("Senha DO USUARIO NA TELA DO CARTÃO É: " + usuario.senha)
+  })
 
   const rotation = useSharedValue(0);
 

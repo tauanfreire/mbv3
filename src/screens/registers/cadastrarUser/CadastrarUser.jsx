@@ -372,7 +372,8 @@ export default function Cadastrar() {
                   createUser()
                   // navigation.navigate("CriarSenha");
                 }
-                navigation.navigate("CriarSenha");
+                // navigation.navigate("CriarSenha");
+                navigation.navigate("CriarSenha", { name, cpf, email, dataNasc, numberPhone });
               }}
             >
               <View style={styles.btn}>
