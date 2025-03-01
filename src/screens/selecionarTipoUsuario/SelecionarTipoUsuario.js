@@ -1,20 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { FontAwesome } from "@expo/vector-icons";
-import { RouteProp, useRoute } from "@react-navigation/native";
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  Image,
-  Alert,
-} from "react-native";
-
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
-
-// import api from "../../services/api";
 
 export default function SelecionarTipoUsuario() {
   const [isMotorista, setIsMotorista] = useState(true);
@@ -43,8 +30,6 @@ export default function SelecionarTipoUsuario() {
             onPress={() => {
               setIsMotorista(true);
               setIsPassageiro(false);
-              // console.log("É MOTORISTA? " + isMotorista);
-              // console.log("É passageiro? " + isPassageiro);
             }}
             style={[
               styles.button,
@@ -55,36 +40,19 @@ export default function SelecionarTipoUsuario() {
             ]}
           >
             <Text style={styles.text}>MOTORISTA</Text>
-            <View style={styles.icon}>
-              <Icon name={"atom"} size={30} color={"black"} />;
-            </View>
+            {isMotorista && (
+              <View style={styles.icon}>
+                <Icon name="check-circle" size={30} color="green" />
+              </View>
+            )}
           </TouchableOpacity>
         </View>
-
-        {/* tabBarIcon: ({ color, size }) => {
-                  let iconName = "";
-        
-                  if (route.name === "Home") {
-                    iconName = "home";
-                  } else if (route.name === "Routes") {
-                    iconName = "route";
-                  } else if (route.name === "Profile") {
-                    iconName = "user-alt";
-                  } else if (route.name === "Settings") {
-                    iconName = "cog";
-                  }
-        
-                  return <Icon name={iconName} size={size} color={color} />;
-                }, */}
 
         <View style={styles.view}>
           <TouchableOpacity
             onPress={() => {
               setIsPassageiro(true);
               setIsMotorista(false);
-              // console.log("_____________________________________");
-              // console.log("É passageiro? " + isPassageiro);
-              // console.log("É MOTORISTA? " + isMotorista);
             }}
             style={[
               styles.button,
@@ -95,6 +63,11 @@ export default function SelecionarTipoUsuario() {
             ]}
           >
             <Text style={styles.text}>PASSAGEIRO</Text>
+            {isPassageiro && (
+              <View style={styles.icon}>
+                <Icon name="check-circle" size={30} color="green" />
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -158,6 +131,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: 300,
     height: 150,
+    position: "relative",
   },
   text: {
     fontSize: 20,
@@ -165,13 +139,10 @@ const styles = StyleSheet.create({
     color: "black",
   },
   icon: {
-    backgroundColor: 'pink',
-    fontWeight: "bold",
-    color: "black",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
+    position: "absolute",
+    top: 10,
+    right: 10,
   },
-
   header: {
     alignItems: "center",
     justifyContent: "center",
@@ -213,3 +184,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
