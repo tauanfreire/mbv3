@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import {
   StyleSheet,
   View,
@@ -12,85 +12,71 @@ import {
   Alert,
 } from "react-native";
 
-// var bcrypt = require('bcryptjs');
 import bcrypt from "react-native-bcrypt";
 var salt = bcrypt.genSaltSync(10);
 
 const showP = require("./../../../assets/img/openP.png");
 const offP = require("./../../../assets/img/offP.png");
 
-import api from "../../../services/api";
-
 export default function Senha() {
-
-  useEffect(() =>{
-    setUsuario({
-      nome: name,
-      email: email,
-      cpf: cpf,
-      numeroTelefone: numberPhone,
-      dataNascimento: dataNasc,
-      senha: senha
-    })
-    console.log("ENTREI NO USE EFECT")
-    console.log("SENHA: " + senha);
-    console.log("CPF : " + usuario.cpf)
-    console.log("NOME : " + usuario.nome)
-    console.log(usuario.dataNascimento)
-    console.log(usuario.numeroTelefone)
-    console.log(usuario.email)
-    console.log("SAI DO USE EFECT")
-  }, [senha])
-  
-  
   const route = useRoute();
-  const { name, email, cpf, numberPhone, dataNasc } = route.params;
-  const [usuario, setUsuario] = useState({
-    nome: name,
-    email: email,
-    cpf: cpf,
-    numeroTelefone: numberPhone,
-    dataNascimento: dataNasc,
-    senha: null
-  })
-  // const usuario = {
-
-  // const [origemAtual, setOrigemAtual] = useState(origem);
+  const usuarioRota = route.params.usuario;
   const navigation = useNavigation();
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [senha, setSenha] = useState("");
+  const [usuario, setUsuario] = useState({
+    nome: usuarioRota.nome,
+    email: usuarioRota.email,
+    cpf: usuarioRota.cpf,
+    numeroTelefone: usuarioRota.numeroTelefone,
+    dataNascimento: usuarioRota.dataNascimento,
+    senha: "", // Inicializa sem senha
+  });
+
   const [validacoes, setValidacoes] = useState({
-    tamanho: null,
-    maiuscula: null,
-    numero: null,
-    especial: null,
-    espaco: null,
+    tamanho: false,
+    maiuscula: false,
+    numero: false,
+    especial: false,
+    espaco: false,
   });
 
   async function cadastrarSenha() {
+    const hash = bcrypt.hashSync(senha, salt);
+    setUsuario((prevUsuario) => ({
+      ...prevUsuario,
+      senha: hash,
+    }));
+    console.log("Senha criptografada:", hash);
+  }
+
+  async function cadastrarUser() {
     try {
-      console.log("entrei no tyr");
-
-      console.log(senha);
-      var hash = bcrypt.hashSync(senha, salt);
-      console.log(senha);
-
-      await api.put(`usuarios/${"67c112704281e892755ff92c"}`, {
-        senha: hash,
+      // console.log("entrei no TRY");
+      await api.post("/usuarios", {
+        nome: usuario.nome,
+        email: usuario.email,
+        cpf: usuario.cpf,
+        dataNascimento: usuario.dataNascimento,
+        numeroTelefone: usuario.numeroTelefone,
+        senha: usuario.senha,
       });
-      setSenha(hash)
-      Alert.alert("Senha atualizada com sucesso");
-      // navigation.navigate('CadastrarCartao')
+      // console.log("Resposta do servidor:", response.data);
+      // console.log("Resposta do servidor:", response.data.cpf);
+      // console.log("Resposta do servidor:", response.data.id);
     } catch (error) {
-      console.log(error);
+      // console.log(error)
+      // console.info(error)
+      console.log(
+        "Erro ao criar usuário: ",
+        error.response ? error.response.data : error.message
+      );
     }
   }
 
   function verificarSenha(e) {
-    // Remove espaços em branco automaticamente
     const senhaSemEspaco = e.replace(/\s/g, "");
-
-    setSenha(senhaSemEspaco); // Atualiza a senha sem espaços
+    setSenha(senhaSemEspaco);
     setValidacoes({
       tamanho: senhaSemEspaco.length >= 8,
       maiuscula: /[A-Z]/.test(senhaSemEspaco),
@@ -98,16 +84,9 @@ export default function Senha() {
       especial: /[!@#$%^&*(),.?":{}|<>]/.test(senhaSemEspaco),
       espaco: !/\s/.test(senhaSemEspaco),
     });
-
-    // var bcryptVar = require('bcryptjs');
-    // var has = bcryptVar.
-
-    // const hashSenha = await bcrypt.hash(senha, 10)
-    console.log(senha);
   }
 
   function getIcon(status) {
-    if (status === null) return null;
     return status ? (
       <FontAwesome name="check-circle" size={18} color="green" />
     ) : (
@@ -174,38 +153,14 @@ export default function Senha() {
           <View style={styles.formAction}>
             <TouchableOpacity
               onPress={() => {
-                cadastrarSenha()
-                navigation.navigate("CadastrarCartao", {usuario});
-                // if(validacoes.espaco == null || validacoes.especial == null || validacoes.maiuscula == null || validacoes.numero == null || validacoes.tamanho == null){
-                // }
-                // for (let validacao in validacoes) {
-                //   if (validacoes[validacao] == false) {
-                //     Alert.alert("Cumpra todos os requsitots da senha!");
-                //     break;
-                //   } else {
-                //     cadastrarSenha();
-                //     // // Load hash from your password DB.
-                //     // var h =
-                //     //   "$2a$10$opOJ44oOEscE1rIFQjnDF.fVBagfD4SpkLu0/.G21t5ekXGbxjbpK";
-                //     // console.log(bcrypt.compareSync(senha, h)); // true
-                //     // bcrypt.compareSync("not_bacon", h); // false
-                //     // navigation.navigate('CadastrarCartao')
-                //   }
-                  // console.log(validacao + validacoes[validacao]);
-                // }
-                // validacoes.espaco ?
-                // console.log(senha);
-                // console.log(usuario.cpf)
-                // console.log(usuario.nome)
-                // console.log(usuario.dataNascimento)
-                // console.log(usuario.numeroTelefone)
-                // console.log(usuario.email)
-                // for(let dado in usuario){
-                //   console.log(usuario[dado])
-                // }
-
-                // var hash = bcrypt.hashSync(senha, salt);
-                // console.log(senha);
+                const todasValidacoesPassam = Object.values(validacoes).every(
+                  (v) => v === true
+                );
+                if (!todasValidacoesPassam) {
+                  alert("Erro, cumpra todos os requisitos da senha.");
+                  return;
+                }
+                cadastrarSenha();
               }}
             >
               <View style={styles.btn}>

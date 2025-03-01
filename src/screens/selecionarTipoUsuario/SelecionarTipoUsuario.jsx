@@ -1,11 +1,13 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 
 export default function SelecionarTipoUsuario() {
-  const [isMotorista, setIsMotorista] = useState(true);
+  const [isMotorista, setIsMotorista] = useState(false);
   const [isPassageiro, setIsPassageiro] = useState(false);
+
+  const navigation = useNavigation()
 
   useEffect(() => {
     console.log("Estado atualizado:");
@@ -36,6 +38,7 @@ export default function SelecionarTipoUsuario() {
               {
                 backgroundColor: isMotorista ? "#63C5DA" : "#A5B3AA",
                 opacity: isMotorista ? 0.6 : 1,
+               
               },
             ]}
           >
@@ -79,8 +82,20 @@ export default function SelecionarTipoUsuario() {
           <View style={styles.formAction}>
             <TouchableOpacity
               onPress={() => {
-                cadastrarSenha();
-                navigation.navigate("CadastrarCartao", { usuario });
+                // cadastrarSenha();
+                if(!isMotorista && !isPassageiro){
+                  Alert.alert("Selecione uma categoria para prosseguir")
+                }
+                else if(isMotorista){
+                  navigation.navigate("CadastrarCarro", {isMotorista});
+                  // Alert.alert("Você selecionou a opção Motorista. Confirma?")
+                  
+                }
+                else{
+                  navigation.navigate("CadastrarCartao", {isPassageiro});
+                  // Alert.alert("Você selecionou a opção Passageiro. Confirma?")
+
+                }
               }}
             >
               <View style={styles.btn}>

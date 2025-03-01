@@ -8,64 +8,63 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 // import { StackTypes } from "../../../routes/stack";
 
 // import api from "../../../services/api";
 
-import api from './../../../services/api'
+import api from "./../../../services/api";
 
 export default function Cadastrar() {
-
-  // async function createUsers(){
-
-  //   try {
-  //     const response = await api.get('/usuarios', );
-  //     console.log(name)
-  //     console.log(email)
-  //     console.log(cpf)
-  //     console.log(numberPhone)
-  //     console.log(dataNasc)
-  //     await api.post("/usuarios", {
-  //       name: name,
-  //       email: email,
-  //       cpf: cpf,
-  //       nasc: dataNasc,
-  //       numberPhone: numberPhone
-  //     })
-      
-  //   } catch (error) {
-  //     console.log("Erro ao criar usuário: " + error);
-      
-  //   }
-    
+    // setUsuario({
+    //   nome: name,
+    //   email: email,
+    //   cpf: cpf,
+    //   dataNascimento: dataNasc,
+    //   numeroTelefone: numberPhone,
+    //   password: "admin"
+    // })
+    // if(usuario){
+    //   console.log("_____________________________________")
+    //   // console.log("SENHA: " + senha);
+    //   console.log("CPF : " + usuario.cpf)
+    //   console.log("NOME : " + usuario.nome)
+    //   console.log("DATA DE NASCIMENTO: " + usuario.dataNascimento)
+    //   console.log("NUMERO DE TELEOFONE: " + usuario.numeroTelefone)
+    //   console.log("EMAIL: " + usuario.email)
+    //   console.log("_____________________________________")
+    //   // navigation.navigate("CriarSenha", usuario);
+    //   navigation.navigate("CriarSenha", {usuario});
+    // }
+    // else{
+    //   console.log("usuaio não existe ainda")
+    // }
+    // console.log(usuario.nome);
+    // console.log(usuario.cpf);
+    // console.log(usuario.dataNascimento);
+    // console.log(usuario.email);
+    // console.log(usuario.numeroTelefone);
+    // try {
+    //     console.log("entrei no TRY")
+    //     await api.post("/usuarios", {
+    //         nome: name,
+    //         email: email,
+    //         cpf: cpf,
+    //         dataNascimento: dataNasc,
+    //         numeroTelefone: numberPhone,
+    //         password: "admin"
+    //     });
+    //     // console.log("Resposta do servidor:", response.data);
+    //     // console.log("Resposta do servidor:", response.data.cpf);
+    //     // console.log("Resposta do servidor:", response.data.id);
+    // } catch (error) {
+    //     // console.log(error)
+    //     // console.info(error)
+    //     console.log("Erro ao criar usuário: ", error.response ? error.response.data : error.message);
+    // }
   // }
-  async function createUser() {
-    try {
-        console.log("entrei no TRY")
-        console.log(name);
-        console.log(cpf);
-        console.log(dataNasc);
-        console.log(email);
-        console.log(numberPhone);
-        const response = await api.post("/usuarios", {
-            name: name,
-            email: email,
-            cpf: cpf,
-            nasc: dataNasc,
-            numberPhone: numberPhone,
-            password: "vazio"
-        });
-        console.log("Resposta do servidor:", response.data);
-        console.log("Resposta do servidor:", response.data.cpf);
-        console.log("Resposta do servidor:", response.data.id);
-    } catch (error) {
-        console.log(error)
-        console.info(error)
-        console.log("Erro ao criar usuário: ", error.response ? error.response.data : error.message);
-    }
-}
 
   // name: req.body.name,
   // email: req.body.email,
@@ -73,7 +72,9 @@ export default function Cadastrar() {
   // numberPhone: req.body.numberPhone,
   // nasc: req.body.nasc,
   // password: req.body.password
-  
+
+  // const [usuario, setUsuario] = useState()
+
   const navigation = useNavigation();
 
   const [name, setName] = useState("");
@@ -92,6 +93,19 @@ export default function Cadastrar() {
   const [numberPhoneVerify, setNumberVerify] = useState(false);
 
   const [idade, setIdade] = useState(null);
+
+    const [usuario, setUsuario] = useState()
+
+  useEffect(()=>{
+    setUsuario({
+      nome: name,
+      email: email,
+      cpf: cpf,
+      numeroTelefone: numberPhone,
+      dataNascimento: dataNasc,
+      senha: 'admin'
+    })
+  }, [name, email, cpf, numberPhone, dataNasc])
 
   function verificarName(e) {
     const nameVar = e.nativeEvent.text;
@@ -155,7 +169,7 @@ export default function Cadastrar() {
   //   console.log(cpf);
   //   console.log(numberPhone);
   //   console.log(dataNasc);
-    
+
   // }
 
   function verificarNumeroTelefone(e) {
@@ -355,25 +369,24 @@ export default function Cadastrar() {
                   nameVerify == false ||
                   emailVerify == false ||
                   cpfVerify == false ||
-                  dataNascVerify == false ||
-                  numberPhone == false
+                  numberPhoneVerify == false ||
+                  dataNascVerify == false
                 ) {
-                  alert("Preencha todos os dados");
+                  Alert.alert(
+                    "Erro",
+                    "Verifique se preencheu todos os dados corretamente"
+                  );
                 } else if (idade < 18) {
-                  alert(
+                  Alert.alert(
+                    "Erro",
                     "Você não pode ter acesso ao MobCocais, você é menor de idade"
                   );
                 } else {
-                  // console.log(name);
-                  // console.log(cpf);
-                  // console.log(dataNasc);
-                  // console.log(email);
-                  // console.log(numberPhone);
-                  createUser()
-                  // navigation.navigate("CriarSenha");
+                  // createUser();
+                  // console.log(usuario)
+                    navigation.navigate("CriarSenha", {usuario});
                 }
                 // navigation.navigate("CriarSenha");
-                navigation.navigate("CriarSenha", { name, cpf, email, dataNasc, numberPhone });
               }}
             >
               <View style={styles.btn}>

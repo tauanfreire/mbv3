@@ -11,6 +11,7 @@ import Senha from "../screens/registers/cadastrarSenha/CadastrarSenha";
 import CadastrarCartao from "../screens/registers/cadastrarCartao/CadastrarCartao";
 import CadastrarCarro from "../screens/registers/cadastrarCarro/CadastrarCarro";
 import MapaScreen from "../screens/mapBackScreen/Mapa";
+import SelecionarTipoUsuario from "../screens/selecionarTipoUsuario/SelecionarTipoUsuario";
 // import Main from "./../routes/Main";
 import TabComponent from "./tab";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -52,6 +53,11 @@ export default function StackComponent() {
           name="CriarSenha"
           component={Senha}
           options={{ title: "Criar Senha" }}
+        />
+        <Stack.Screen
+          name="TipoUsuario"
+          component={SelecionarTipoUsuario}
+          options={{ title: "Selecione o tipo de Usuário" }}
         />
         <Stack.Screen
           name="CadastrarCartao"

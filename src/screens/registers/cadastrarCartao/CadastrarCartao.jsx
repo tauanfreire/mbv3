@@ -26,11 +26,11 @@ export default function CadastrarCartao() {
   const [validaade, setValidade] = useState("");
   const [cvv, setCvv] = useState("");
 
-  useEffect(()=>{
-    console.log(usuario)
-    console.log("NOME DO USUARIO NA TELA DO CARTÃO É: " + usuario.nome)
-    console.log("Senha DO USUARIO NA TELA DO CARTÃO É: " + usuario.senha)
-  })
+  // useEffect(()=>{
+  //   console.log(usuario)
+  //   console.log("NOME DO USUARIO NA TELA DO CARTÃO É: " + usuario.nome)
+  //   console.log("Senha DO USUARIO NA TELA DO CARTÃO É: " + usuario.senha)
+  // })
 
   const rotation = useSharedValue(0);
 
