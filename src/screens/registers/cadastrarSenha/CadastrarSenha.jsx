@@ -12,6 +12,8 @@ import {
   Alert,
 } from "react-native";
 
+import api from "../../../services/api";
+
 import bcrypt from "react-native-bcrypt";
 var salt = bcrypt.genSaltSync(10);
 
@@ -50,29 +52,26 @@ export default function Senha() {
     console.log("Senha criptografada:", hash);
   }
 
-  async function cadastrarUser() {
+  async function cadastrarUser(usuarioAtualizado) {
     try {
-      // console.log("entrei no TRY");
       await api.post("/usuarios", {
-        nome: usuario.nome,
-        email: usuario.email,
-        cpf: usuario.cpf,
-        dataNascimento: usuario.dataNascimento,
-        numeroTelefone: usuario.numeroTelefone,
-        senha: usuario.senha,
+        nome: usuarioAtualizado.nome,
+        email: usuarioAtualizado.email,
+        cpf: usuarioAtualizado.cpf,
+        dataNascimento: usuarioAtualizado.dataNascimento,
+        numeroTelefone: usuarioAtualizado.numeroTelefone,
+        senha: usuarioAtualizado.senha, // Agora a senha está garantida
       });
-      // console.log("Resposta do servidor:", response.data);
-      // console.log("Resposta do servidor:", response.data.cpf);
-      // console.log("Resposta do servidor:", response.data.id);
+      console.log("Usuário cadastrado com sucesso!");
+      navigation.navigate("TipoUsuario", usuario.cpf)
     } catch (error) {
-      // console.log(error)
-      // console.info(error)
       console.log(
         "Erro ao criar usuário: ",
         error.response ? error.response.data : error.message
       );
     }
   }
+  
 
   function verificarSenha(e) {
     const senhaSemEspaco = e.replace(/\s/g, "");
@@ -152,7 +151,7 @@ export default function Senha() {
 
           <View style={styles.formAction}>
             <TouchableOpacity
-              onPress={() => {
+              onPress={async () => {
                 const todasValidacoesPassam = Object.values(validacoes).every(
                   (v) => v === true
                 );
@@ -160,7 +159,16 @@ export default function Senha() {
                   alert("Erro, cumpra todos os requisitos da senha.");
                   return;
                 }
-                cadastrarSenha();
+
+                const hash = bcrypt.hashSync(senha, salt);
+                console.log("Senha criptografada:", hash);
+
+                // Atualizando o estado e só chamando a API depois
+                setUsuario((prevUsuario) => {
+                  const novoUsuario = { ...prevUsuario, senha: hash };
+                  cadastrarUser(novoUsuario);
+                  return novoUsuario;
+                });
               }}
             >
               <View style={styles.btn}>

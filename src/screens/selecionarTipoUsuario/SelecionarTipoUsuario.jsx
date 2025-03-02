@@ -1,20 +1,47 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
+
+import api from "../../services/api";
 
 export default function SelecionarTipoUsuario() {
   const [isMotorista, setIsMotorista] = useState(false);
   const [isPassageiro, setIsPassageiro] = useState(false);
 
   const navigation = useNavigation()
+    const route = useRoute();
+    const cpfUser = route.params;
+    const [idUser, setIdUser] = useState()
+  // const route = useRoute()
+  
 
   useEffect(() => {
+    console.log(cpfUser)
     console.log("Estado atualizado:");
     console.log("isMotorista:", isMotorista);
     console.log("isPassageiro:", isPassageiro);
     console.log("_____________________________________");
+    buscarId()
   }, [isMotorista, isPassageiro]);
+
+  async function buscarId(){
+    try {
+      const response = await api.get('/usuarios')
+      console.log(response.data)
+      const usuarios = response.data
+      usuarios.map((usuario)=>{
+        if(usuario.cpf === cpfUser){
+          setIdUser(usuario.id)
+        }
+      })
+
+      console.log(idUser)
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return (
     <View style={styles.container}>

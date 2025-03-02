@@ -18,52 +18,52 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import api from "./../../../services/api";
 
 export default function Cadastrar() {
-    // setUsuario({
-    //   nome: name,
-    //   email: email,
-    //   cpf: cpf,
-    //   dataNascimento: dataNasc,
-    //   numeroTelefone: numberPhone,
-    //   password: "admin"
-    // })
-    // if(usuario){
-    //   console.log("_____________________________________")
-    //   // console.log("SENHA: " + senha);
-    //   console.log("CPF : " + usuario.cpf)
-    //   console.log("NOME : " + usuario.nome)
-    //   console.log("DATA DE NASCIMENTO: " + usuario.dataNascimento)
-    //   console.log("NUMERO DE TELEOFONE: " + usuario.numeroTelefone)
-    //   console.log("EMAIL: " + usuario.email)
-    //   console.log("_____________________________________")
-    //   // navigation.navigate("CriarSenha", usuario);
-    //   navigation.navigate("CriarSenha", {usuario});
-    // }
-    // else{
-    //   console.log("usuaio não existe ainda")
-    // }
-    // console.log(usuario.nome);
-    // console.log(usuario.cpf);
-    // console.log(usuario.dataNascimento);
-    // console.log(usuario.email);
-    // console.log(usuario.numeroTelefone);
-    // try {
-    //     console.log("entrei no TRY")
-    //     await api.post("/usuarios", {
-    //         nome: name,
-    //         email: email,
-    //         cpf: cpf,
-    //         dataNascimento: dataNasc,
-    //         numeroTelefone: numberPhone,
-    //         password: "admin"
-    //     });
-    //     // console.log("Resposta do servidor:", response.data);
-    //     // console.log("Resposta do servidor:", response.data.cpf);
-    //     // console.log("Resposta do servidor:", response.data.id);
-    // } catch (error) {
-    //     // console.log(error)
-    //     // console.info(error)
-    //     console.log("Erro ao criar usuário: ", error.response ? error.response.data : error.message);
-    // }
+  // setUsuario({
+  //   nome: name,
+  //   email: email,
+  //   cpf: cpf,
+  //   dataNascimento: dataNasc,
+  //   numeroTelefone: numberPhone,
+  //   password: "admin"
+  // })
+  // if(usuario){
+  //   console.log("_____________________________________")
+  //   // console.log("SENHA: " + senha);
+  //   console.log("CPF : " + usuario.cpf)
+  //   console.log("NOME : " + usuario.nome)
+  //   console.log("DATA DE NASCIMENTO: " + usuario.dataNascimento)
+  //   console.log("NUMERO DE TELEOFONE: " + usuario.numeroTelefone)
+  //   console.log("EMAIL: " + usuario.email)
+  //   console.log("_____________________________________")
+  //   // navigation.navigate("CriarSenha", usuario);
+  //   navigation.navigate("CriarSenha", {usuario});
+  // }
+  // else{
+  //   console.log("usuaio não existe ainda")
+  // }
+  // console.log(usuario.nome);
+  // console.log(usuario.cpf);
+  // console.log(usuario.dataNascimento);
+  // console.log(usuario.email);
+  // console.log(usuario.numeroTelefone);
+  // try {
+  //     console.log("entrei no TRY")
+  //     await api.post("/usuarios", {
+  //         nome: name,
+  //         email: email,
+  //         cpf: cpf,
+  //         dataNascimento: dataNasc,
+  //         numeroTelefone: numberPhone,
+  //         password: "admin"
+  //     });
+  //     // console.log("Resposta do servidor:", response.data);
+  //     // console.log("Resposta do servidor:", response.data.cpf);
+  //     // console.log("Resposta do servidor:", response.data.id);
+  // } catch (error) {
+  //     // console.log(error)
+  //     // console.info(error)
+  //     console.log("Erro ao criar usuário: ", error.response ? error.response.data : error.message);
+  // }
   // }
 
   // name: req.body.name,
@@ -94,18 +94,100 @@ export default function Cadastrar() {
 
   const [idade, setIdade] = useState(null);
 
-    const [usuario, setUsuario] = useState()
+  const [usuario, setUsuario] = useState();
 
-  useEffect(()=>{
-    setUsuario({
+  // function converterParaDataISO(dataString) {
+  //   const [dia, mes, ano] = dataString.split('/'); // Divide a string em partes
+  //   return new Date(`${ano}-${mes}-${dia}T00:00:00.000Z`); // Monta no formato ISO
+  // }
+
+  // const dataNascimento = converterParaDataISO("23/07/2005");
+  // console.log(dataNascimento); // Saída: 2005-07-23T00:00:00.000Z
+  function converterParaDataISO(dataString) {
+    if (!dataString) {
+      return null; // Retorna null se a data estiver vazia
+    }
+  
+    let dia, mes, ano;
+  
+    if (dataString.includes("/")) {
+      // Caso venha no formato "23/07/2005"
+      [dia, mes, ano] = dataString.split("/");
+    } else if (dataString.length === 8) {
+      // Caso venha no formato "23072005"
+      dia = dataString.substring(0, 2);
+      mes = dataString.substring(2, 4);
+      ano = dataString.substring(4, 8);
+    } else {
+      throw new Error("Formato de data inválido!");
+    }
+  
+    const data = new Date(`${ano}-${mes}-${dia}T00:00:00.000Z`);
+  
+    if (isNaN(data.getTime())) {
+      throw new Error("Data inválida!");
+    }
+  
+    return data;
+  }
+  
+  // Testando
+  console.log(converterParaDataISO("23/07/2005")); // ✅ 2005-07-23T00:00:00.000Z
+  console.log(converterParaDataISO("23072005"));  // ✅ 2005-07-23T00:00:00.000Z
+  console.log(converterParaDataISO(""));          // ✅ null
+  console.log(converterParaDataISO(null));        // ✅ null
+  console.log(converterParaDataISO(undefined));   // ✅ null
+  
+
+  // Testando com os dois formatos:
+  console.log(converterParaDataISO("23/07/2005")); // ✅ Saída: 2005-07-23T00:00:00.000Z
+  console.log(converterParaDataISO("23072005")); // ✅ Saída: 2005-07-23T00:00:00.000Z
+
+  function handleContinue() {
+    if (
+      !nameVerify ||
+      !emailVerify ||
+      !cpfVerify ||
+      !numberPhoneVerify ||
+      !dataNascVerify
+    ) {
+      Alert.alert("Erro", "Verifique se preencheu todos os dados corretamente");
+      return;
+    }
+  
+    if (idade < 18) {
+      Alert.alert(
+        "Erro",
+        "Você não pode ter acesso ao MobCocais, você é menor de idade"
+      );
+      return;
+    }
+  
+    // Criar objeto apenas quando for necessário
+    const usuario = {
       nome: name,
       email: email,
       cpf: cpf,
       numeroTelefone: numberPhone,
-      dataNascimento: dataNasc,
-      senha: 'admin'
-    })
-  }, [name, email, cpf, numberPhone, dataNasc])
+      dataNascimento: converterParaDataISO(dataNasc),
+      senha: "admin",
+    };
+  
+    // Navegar para a próxima tela com os dados do usuário
+    navigation.navigate("CriarSenha", { usuario });
+  }
+  
+
+  // useEffect(() => {
+  //   setUsuario({
+  //     nome: name,
+  //     email: email,
+  //     cpf: cpf,
+  //     numeroTelefone: numberPhone,
+  //     dataNascimento: converterParaDataISO(dataNasc),
+  //     senha: "admin",
+  //   });
+  // }, [name, email, cpf, numberPhone, dataNasc]);
 
   function verificarName(e) {
     const nameVar = e.nativeEvent.text;
@@ -134,19 +216,17 @@ export default function Cadastrar() {
   }
 
   function verificarCPF(e) {
-    const cpfVar = e.nativeEvent.text;
-    setCpf(cpfVar);
+    let cpfVar = e.nativeEvent.text.replace(/\D/g, ""); // Remove caracteres não numéricos
+    setCpf(cpfVar); // Armazena sem pontos e traços
     setCPFVerify(false); // Começa como falso
-
-    console.log(cpfVar); // Debug
-
-    const cpfNumerico = cpfVar.replace(/\D/g, ""); // Remove caracteres não numéricos
-
-    if (cpfNumerico.length !== 11) return;
-
+  
+    console.log("CPF sem formatação:", cpfVar); // Debug
+  
+    if (cpfVar.length !== 11) return;
+  
     // Regex para evitar CPFs com todos os números iguais
-    if (/^(\d)\1+$/.test(cpfNumerico)) return;
-
+    if (/^(\d)\1+$/.test(cpfVar)) return;
+  
     // Validação dos dígitos verificadores
     const validarDigito = (cpf, multiplicador) => {
       let soma = 0;
@@ -156,12 +236,13 @@ export default function Cadastrar() {
       let resto = (soma * 10) % 11;
       return resto === 10 || resto === 11 ? 0 : resto;
     };
-
-    if (validarDigito(cpfNumerico, 10) !== parseInt(cpfNumerico[9])) return;
-    if (validarDigito(cpfNumerico, 11) !== parseInt(cpfNumerico[10])) return;
-
+  
+    if (validarDigito(cpfVar, 10) !== parseInt(cpfVar[9])) return;
+    if (validarDigito(cpfVar, 11) !== parseInt(cpfVar[10])) return;
+  
     setCPFVerify(true);
   }
+  
 
   // function registerUser(){
   //   console.log(name)
@@ -365,27 +446,28 @@ export default function Cadastrar() {
           <View style={styles.formAction}>
             <TouchableOpacity
               onPress={() => {
-                if (
-                  nameVerify == false ||
-                  emailVerify == false ||
-                  cpfVerify == false ||
-                  numberPhoneVerify == false ||
-                  dataNascVerify == false
-                ) {
-                  Alert.alert(
-                    "Erro",
-                    "Verifique se preencheu todos os dados corretamente"
-                  );
-                } else if (idade < 18) {
-                  Alert.alert(
-                    "Erro",
-                    "Você não pode ter acesso ao MobCocais, você é menor de idade"
-                  );
-                } else {
-                  // createUser();
-                  // console.log(usuario)
-                    navigation.navigate("CriarSenha", {usuario});
-                }
+                handleContinue()
+                // if (
+                //   nameVerify == false ||
+                //   emailVerify == false ||
+                //   cpfVerify == false ||
+                //   numberPhoneVerify == false ||
+                //   dataNascVerify == false
+                // ) {
+                //   Alert.alert(
+                //     "Erro",
+                //     "Verifique se preencheu todos os dados corretamente"
+                //   );
+                // } else if (idade < 18) {
+                //   Alert.alert(
+                //     "Erro",
+                //     "Você não pode ter acesso ao MobCocais, você é menor de idade"
+                //   );
+                // } else {
+                //   // createUser();
+                //   // console.log(usuario)
+                //   navigation.navigate("CriarSenha", { usuario });
+                // }
                 // navigation.navigate("CriarSenha");
               }}
             >
