@@ -18,13 +18,82 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 // import { StackTypes } from "../../../routes/stack";
 
 export default function CadastrarCartao() {
-  const route = useRoute();
-  const {usuario} = route.params
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
+  // const route = useRoute();
+  // const idUser = route.params;
+  // const [id, setId] = useState(idUser);
+
+  // const {usuario} = route.params
+
   const [titular, setTitular] = useState("");
   const [numberCard, setNumberCard] = useState("");
   const [validaade, setValidade] = useState("");
   const [cvv, setCvv] = useState("");
+
+  const [titularVerify, setTitularVerify] = useState(false);
+  const [numberCardVerify, setCardNumberVerify] = useState(false);
+  const [validadeVerify, setvalidadeVerify] = useState(false);
+  const [cvvVerify, setcvvVerify] = useState(false);
+
+  function verificarTitular(e) {
+    const titularVar = e.nativeEvent.text;
+    setTitular(titularVar);
+    console.log("Titular Var: " + titularVar);
+    console.log("Titular State: " + titular);
+    setTitularVerify(false);
+
+    if (titularVar.length > 1) {
+      setTitularVerify(true);
+    }
+  }
+
+  function verificarNumeroCartao(e) {
+    const numeroInput = e.nativeEvent.text;
+  console.log("Número digitado:", numeroInput);
+
+  // Remove tudo que não for número
+  const numeroVar = numeroInput.replace(/\D/g, "");  
+  console.log("Número apenas com dígitos:", numeroVar);
+
+  setCardNumberVerify(false); // Assume que é inválido por padrão
+
+  // Formata o número para exibição (XXXX XXXX XXXX XXXX)
+  let formattedText = numeroVar.replace(/(\d{4})(?=\d)/g, "$1 ");
+  console.log("Número formatado:", formattedText);
+
+  // Verifica se o número tem **exatamente** entre 13 e 19 dígitos antes de validar pelo Luhn
+  if (numeroVar.length >= 13 && numeroVar.length <= 19) {
+    if (luhnCheck(numeroVar)) {
+      setCardNumberVerify(true);
+    }
+  }
+
+  setNumberCard(formattedText); // Atualiza o estado com o número formatado
+  }
+
+  // Algoritmo de Luhn para validar o número do cartão
+  function luhnCheck(num) {
+    let sum = 0;
+    let shouldDouble = false;
+
+    for (let i = num.length - 1; i >= 0; i--) {
+      let digit = parseInt(num.charAt(i));
+
+      if (shouldDouble) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+
+      sum += digit;
+      shouldDouble = !shouldDouble;
+    }
+
+    return sum % 10 === 0;
+  }
+
+  function verificarValidade(e) {}
+
+  function verificarCvv(e) {}
 
   // useEffect(()=>{
   //   console.log(usuario)
@@ -138,7 +207,14 @@ export default function CadastrarCartao() {
               onFocus={() =>
                 (rotation.value = withTiming(0, { duration: 500 }))
               }
+              onChange={(e) => verificarTitular(e)}
+              // onChangeText={(e) => verificarTitular(e)}
             />
+            {titular.length < 1 ? null : titularVerify ? null : (
+              <Text style={{ color: "red", fontWeight: "bold" }}>
+                Titular não pode ter menos que 2 letras
+              </Text>
+            )}
             <TextInput
               style={styles.input}
               keyboardType="numeric"
@@ -148,7 +224,13 @@ export default function CadastrarCartao() {
               onFocus={() =>
                 (rotation.value = withTiming(180, { duration: 500 }))
               }
+              onChange={(e) => verificarNumeroCartao(e)}
             />
+            {numberCard.length < 1 ? null : numberCardVerify ? null : (
+              <Text style={{ color: "red", fontWeight: "bold" }}>
+                Verifique o número do cartão
+              </Text>
+            )}
             <View style={styles.row}>
               <TextInput
                 style={[styles.input, styles.halfInput]}
@@ -175,7 +257,7 @@ export default function CadastrarCartao() {
             <TouchableOpacity
               style={{ marginTop: 50 }}
               onPress={() => {
-                navigation.navigate("CadastrarCarro");
+                // navigation.navigate("CadastrarCarro");
               }}
             >
               <View style={styles.btn}>

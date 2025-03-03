@@ -268,52 +268,51 @@ export default function Cadastrar() {
   }
 
   function verificarDataNascimento(e) {
-    let dataVar = e.nativeEvent.text;
+    let dataVar = e.nativeEvent.text.trim(); // Remove espaços extras
     setDataNasc(dataVar);
     setDataNascVerify(false);
-
-    console.log(dataVar); // Debug
-
-    // Ajustar formato caso venha sem barras (ex: "23072005" → "23/07/2005")
+  
+    console.log("Entrada:", dataVar);
+  
+    // Ajusta formato se vier sem barras
     if (/^\d{8}$/.test(dataVar)) {
-      dataVar = `${dataVar.slice(0, 2)}/${dataVar.slice(2, 4)}/${dataVar.slice(
-        4,
-        8
-      )}`;
+      dataVar = `${dataVar.slice(0, 2)}/${dataVar.slice(2, 4)}/${dataVar.slice(4, 8)}`;
     }
-
-    // Regex para validar formato DD/MM/AAAA
-    const regexData =
-      /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/;
-    if (!regexData.test(dataVar)) return; // Se não estiver no formato correto, retorna
-
-    // Converter para objeto Date
+  
+    const regexData = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/(19|20)\d{2}$/;
+    if (!regexData.test(dataVar)) {
+      console.log("Formato inválido!");
+      return;
+    }
+  
     const [dia, mes, ano] = dataVar.split("/").map(Number);
     const dataNascimento = new Date(ano, mes - 1, dia);
-    const hoje = new Date();
-
-    // Verifica se a data realmente existe (ex.: não aceita 31/02/2023)
+  
+    console.log("Data convertida:", dataNascimento);
+  
     if (
       dataNascimento.getDate() !== dia ||
       dataNascimento.getMonth() + 1 !== mes ||
       dataNascimento.getFullYear() !== ano
     ) {
+      console.log("Data inválida!");
       return;
     }
-
-    // Calcular idade
+  
+    const hoje = new Date();
     let idade = hoje.getFullYear() - dataNascimento.getFullYear();
     if (
       hoje.getMonth() < dataNascimento.getMonth() ||
-      (hoje.getMonth() === dataNascimento.getMonth() &&
-        hoje.getDate() < dataNascimento.getDate())
+      (hoje.getMonth() === dataNascimento.getMonth() && hoje.getDate() < dataNascimento.getDate())
     ) {
       idade--;
-      setIdade(idade);
-      setDataNascVerify(true);
-      console.log(idade);
     }
+  
+    setIdade(idade);
+    setDataNascVerify(true);
+    console.log("Idade:", idade);
   }
+  
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#e8ecf4" }}>

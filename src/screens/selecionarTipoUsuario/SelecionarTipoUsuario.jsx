@@ -9,39 +9,109 @@ export default function SelecionarTipoUsuario() {
   const [isMotorista, setIsMotorista] = useState(false);
   const [isPassageiro, setIsPassageiro] = useState(false);
 
-  const navigation = useNavigation()
-    const route = useRoute();
-    const cpfUser = route.params;
-    const [idUser, setIdUser] = useState()
-  // const route = useRoute()
+  const navigation = useNavigation();
+  const route = useRoute();
+  const cpfUser = route.params;
+  const [idUser, setIdUser] = useState();
+
+  async function cadastrarM() {
+    if(idUser){
+      console.log("Existe id no estado {IdUser} : " + idUser);
+      try {
+        await api.post("/motorista", {
+          userId: idUser,
+        });
+        console.log("motorista cadastrado com sucesso!");
+        navigation.navigate("CadastrarCarro", idUser);
+      } catch (error) {
+        console.log(
+          "Erro ao criar motorista: ",
+          error.response ? error.response.data : error.message
+        );
+      }
+    }
+    else{
+      console.log("Não existe id no estado {IdUser}");
+      
+    }
+  }
   
+  async function cadastrarP() {
+    if(idUser){
+      console.log("Existe id no estado {IdUser} : " + idUser);
+      try {
+        await api.post("/passageiro", {
+          userId: idUser,
+        });
+        console.log("passageiro cadastrado com sucesso!");
+        navigation.navigate("CadastrarCartao", idUser);
+      } catch (error) {
+        console.log(
+          "Erro ao criar passageiro: ",
+          error.response ? error.response.data : error.message
+        );
+      }
+    }
+    else{
+      console.log("Não existe id no estado {IdUser}");
+      
+    }
+  }
+  // const route = useRoute()
 
   useEffect(() => {
-    console.log(cpfUser)
+    console.log(cpfUser);
     console.log("Estado atualizado:");
     console.log("isMotorista:", isMotorista);
     console.log("isPassageiro:", isPassageiro);
     console.log("_____________________________________");
-    buscarId()
-  }, [isMotorista, isPassageiro]);
 
-  async function buscarId(){
+    buscarId()
+  }, []);
+
+  async function buscarId() {
     try {
-      const response = await api.get('/usuarios')
-      console.log(response.data)
-      const usuarios = response.data
-      usuarios.map((usuario)=>{
-        if(usuario.cpf === cpfUser){
+      console.log("ESTOU BUSCANDO USUARIO AGUARDE")
+      const response = await api.get("/usuarios");
+      const usuarios = response.data;
+      usuarios.map((usuario) =>{
+        if(usuario.cpf == cpfUser){
           setIdUser(usuario.id)
         }
       })
-
-      console.log(idUser)
-      
+      // console.log(idUser);
     } catch (error) {
-      console.log(error)
+      console.log("Erro ao buscar o id do usuario " + error);
     }
   }
+
+  // async function criarMotorista() {
+  //   if (idUser) {
+  //     console.log("O user id existe: " + idUser);
+
+  //     try {
+  //       await api.post("/motorista", {
+  //         userId: idUser,
+  //       });
+  //       navigation.navigate("CadastrarCarro", { userId });
+  //     } catch (error) {
+  //       console.log("Erro ao criar o motorista " + error);
+  //     }
+  //   } else {
+  //     console.log("o userid não existe");
+  //   }
+  // }
+
+  // async function criarPassageiro() {
+  //   try {
+  //     await api.post("/passageiro", {
+  //       userId: idUser,
+  //     });
+  //     navigation.navigate("CadastrarCartao", { userId });
+  //   } catch (error) {
+  //     console.log("Erro ao criar passageiro " + error);
+  //   }
+  // }
 
   return (
     <View style={styles.container}>
@@ -65,7 +135,6 @@ export default function SelecionarTipoUsuario() {
               {
                 backgroundColor: isMotorista ? "#63C5DA" : "#A5B3AA",
                 opacity: isMotorista ? 0.6 : 1,
-               
               },
             ]}
           >
@@ -110,18 +179,18 @@ export default function SelecionarTipoUsuario() {
             <TouchableOpacity
               onPress={() => {
                 // cadastrarSenha();
-                if(!isMotorista && !isPassageiro){
-                  Alert.alert("Selecione uma categoria para prosseguir")
-                }
-                else if(isMotorista){
-                  navigation.navigate("CadastrarCarro", {isMotorista});
+                if (!isMotorista && !isPassageiro) {
+                  Alert.alert("Selecione uma categoria para prosseguir");
+                } else if (isMotorista) {
+                  cadastrarM()
+                  // buscarId();
+                  // criarMotorista();
                   // Alert.alert("Você selecionou a opção Motorista. Confirma?")
-                  
-                }
-                else{
-                  navigation.navigate("CadastrarCartao", {isPassageiro});
+                } else {
+                  cadastrarP()
+                  // buscarId();
+                  // criarPassageiro();
                   // Alert.alert("Você selecionou a opção Passageiro. Confirma?")
-
                 }
               }}
             >
@@ -226,4 +295,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-
