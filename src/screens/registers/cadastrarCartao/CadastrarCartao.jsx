@@ -15,6 +15,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/Fontisto";
+import Icon2 from "react-native-vector-icons/Fontisto";
 // import { StackTypes } from "../../../routes/stack";
 
 export default function CadastrarCartao() {
@@ -22,12 +24,11 @@ export default function CadastrarCartao() {
   // const route = useRoute();
   // const idUser = route.params;
   // const [id, setId] = useState(idUser);
-
   // const {usuario} = route.params
 
   const [titular, setTitular] = useState("");
   const [numberCard, setNumberCard] = useState("");
-  const [validaade, setValidade] = useState("");
+  const [validade, setValidade] = useState("");
   const [cvv, setCvv] = useState("");
 
   const [titularVerify, setTitularVerify] = useState(false);
@@ -35,71 +36,100 @@ export default function CadastrarCartao() {
   const [validadeVerify, setvalidadeVerify] = useState(false);
   const [cvvVerify, setcvvVerify] = useState(false);
 
+  const [bandeiraCartao, setBandeiraCartao] = useState("");
+
   function verificarTitular(e) {
     const titularVar = e.nativeEvent.text;
     setTitular(titularVar);
-    console.log("Titular Var: " + titularVar);
-    console.log("Titular State: " + titular);
-    setTitularVerify(false);
-
-    if (titularVar.length > 1) {
-      setTitularVerify(true);
-    }
+    setTitularVerify(titularVar.length > 1);
   }
 
   function verificarNumeroCartao(e) {
     const numeroInput = e.nativeEvent.text;
-  console.log("Número digitado:", numeroInput);
+    const numeroVar = numeroInput.replace(/\D/g, "");
+    setCardNumberVerify(false);
 
-  // Remove tudo que não for número
-  const numeroVar = numeroInput.replace(/\D/g, "");  
-  console.log("Número apenas com dígitos:", numeroVar);
-
-  setCardNumberVerify(false); // Assume que é inválido por padrão
-
-  // Formata o número para exibição (XXXX XXXX XXXX XXXX)
-  let formattedText = numeroVar.replace(/(\d{4})(?=\d)/g, "$1 ");
-  console.log("Número formatado:", formattedText);
-
-  // Verifica se o número tem **exatamente** entre 13 e 19 dígitos antes de validar pelo Luhn
-  if (numeroVar.length >= 13 && numeroVar.length <= 19) {
-    if (luhnCheck(numeroVar)) {
-      setCardNumberVerify(true);
+    if (numeroVar.length >= 13 && numeroVar.length <= 19) {
+      if (luhnCheck(numeroVar) && verificarBandeira(numeroVar)) {
+        console.log("Bandeira: " + verificarBandeira(numeroVar));
+        setCardNumberVerify(true);
+      }
     }
+    setNumberCard(numeroVar);
   }
 
-  setNumberCard(formattedText); // Atualiza o estado com o número formatado
+  function verificarValidade(e) {
+    const validadeInput = e.nativeEvent.text; // Obtém o valor do input
+    const validadeVar = validadeInput.replace(/\D/g, ""); // Remove caracteres não numéricos
+    console.log(validadeInput);
+    console.log(validadeVar);
+    setvalidadeVerify(false); // Reseta o estado de verificação
+
+    console.log("Validade.length: " + validadeVar.length);
+
+    if (validadeVar.length === 4) {
+      const mes = parseInt(validadeVar.substring(0, 2), 10); // Extrai o mês
+      const ano = parseInt(validadeVar.substring(2, 4), 10); // Extrai o ano
+      const dataAtual = new Date(); // Obtém a data atual
+      const dataValidade = new Date(`20${ano}`, mes - 1); // Cria a data de validade
+
+      // Verifica se o mês é válido e se a data de validade é futura
+      if (mes >= 1 && mes <= 12 && dataValidade > dataAtual) {
+        setvalidadeVerify(true); // Marca como válida
+      }
+    }
+    setValidade(validadeVar); // Atualiza o estado com a validade formatada
   }
 
-  // Algoritmo de Luhn para validar o número do cartão
+  function verificarCvv(e) {
+    const cvvInput = e.nativeEvent.text;
+    const cvvVar = cvvInput.replace(/\D/g, "");
+    if(bandeiraCartao == 'amex'){
+      setcvvVerify(cvvVar.length === 4); // Ajuste para 4 se for Amex
+    }
+    else{
+      setcvvVerify(cvvVar.length === 3); // Ajuste para 4 se for Amex
+    }
+    setCvv(cvvVar);
+  }
+
+  function verificarBandeira(numero) {
+      const bandeiras = {
+        visa: /^4[0-9]{12}(?:[0-9]{3})?$/, // Visa
+        mastercard: /^5[1-5][0-9]{14}$/, // MasterCard
+        amex: /^3[47][0-9]{13}$/, // American Express
+        diners: /^3(?:0[0-5]|[68][0-9])[0-9]{11}$/, // Diners Club
+        discover: /^6(?:011|5[0-9]{2})[0-9]{12}$/, // Discover
+        jcb: /^(?:2131|1800|35\d{3})\d{11}$/, // JCB
+        elo: /^(4011|4312|4389|4514|4576|5041|5067|5090|6504|6516|6517|6550)[0-9]{12,15}$/, // Elo
+        hipercard: /^(6062|3841|6370|6375)[0-9]{8,13}$/, // Hipercard
+      };
+
+    // Verifica se o número corresponde a alguma bandeira
+    for (const [bandeira, regex] of Object.entries(bandeiras)) {
+      if (regex.test(numero)) {
+        setBandeiraCartao(bandeira);
+        return bandeira; // Retorna o nome da bandeira
+      }
+    }
+    return null; // Retorna null se nenhuma bandeira for encontrada
+  }
+
   function luhnCheck(num) {
     let sum = 0;
     let shouldDouble = false;
 
     for (let i = num.length - 1; i >= 0; i--) {
       let digit = parseInt(num.charAt(i));
-
       if (shouldDouble) {
         digit *= 2;
         if (digit > 9) digit -= 9;
       }
-
       sum += digit;
       shouldDouble = !shouldDouble;
     }
-
     return sum % 10 === 0;
   }
-
-  function verificarValidade(e) {}
-
-  function verificarCvv(e) {}
-
-  // useEffect(()=>{
-  //   console.log(usuario)
-  //   console.log("NOME DO USUARIO NA TELA DO CARTÃO É: " + usuario.nome)
-  //   console.log("Senha DO USUARIO NA TELA DO CARTÃO É: " + usuario.senha)
-  // })
 
   const rotation = useSharedValue(0);
 
@@ -113,36 +143,15 @@ export default function CadastrarCartao() {
     backfaceVisibility: "hidden",
   }));
 
-  const handleCardNumberChange = (text) => {
-    let formattedText = text.replace(/\D/g, "").substring(0, 16);
-    formattedText = formattedText.replace(/(\d{4})(?=\d)/g, "$1 ");
-    setNumberCard(formattedText);
-  };
-
-  const handleValidadeChange = (text) => {
-    let formattedText = text.replace(/\D/g, "").substring(0, 4);
-    formattedText = formattedText.replace(/(\d{2})(\d{0,2})/, "$1/$2");
-    setValidade(formattedText);
-  };
-
-  const handleCVVChange = (text) => {
-    let formattedText = text.replace(/\D/g, "").substring(0, 3);
-    setCvv(formattedText);
-  };
-
   const toggleCard = () => {
     rotation.value = withTiming(rotation.value === 0 ? 180 : 0, {
       duration: 500,
     });
   };
 
-  const handleTitularChange = (text) => {
-    setTitular(text);
-  };
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#e8ecf4" }}>
-      <KeyboardAwareScrollView
+      <View
         style={styles.containerScroll}
         extraHeight={150}
         enableOnAndroid={true}
@@ -166,8 +175,16 @@ export default function CadastrarCartao() {
               <View style={styles.bottom}>
                 <Text style={styles.value}>{titular}</Text>
                 <View style={styles.bandeiraCartao}>
-                  <View style={[styles.circle, styles.red]}></View>
-                  <View style={[styles.circle, styles.orange]}></View>
+                    <Icon
+                      name="credit-card"
+                      size={20}
+                      style={{
+                        backgroundColor: "pink",
+                        color: "#176585",
+                        borderWidth: 1,
+                        borderColor: "pink",
+                      }}
+                    />
                 </View>
               </View>
             </Animated.View>
@@ -176,13 +193,17 @@ export default function CadastrarCartao() {
               <View style={styles.top}>
                 <View>
                   <Text style={styles.label}>Número do cartão</Text>
-                  <Text style={styles.value}>{numberCard}</Text>
+                  <Text style={styles.value}>
+                    {numberCard.replace(/(\d{4})(?=\d)/g, "$1 ")}
+                  </Text>
                 </View>
               </View>
               <View style={styles.bottom}>
                 <View>
                   <Text style={styles.label}>Validade</Text>
-                  <Text style={styles.value}>{validaade}</Text>
+                  <Text style={styles.value}>
+                    {validade.replace(/(\d{2})(?=\d)/g, "$1/")}
+                  </Text>
                 </View>
                 <View>
                   <Text style={styles.label}>CVV</Text>
@@ -202,13 +223,11 @@ export default function CadastrarCartao() {
             <TextInput
               style={styles.input}
               value={titular}
-              onChangeText={handleTitularChange}
               placeholder="TITULAR DO CARTÃO"
               onFocus={() =>
                 (rotation.value = withTiming(0, { duration: 500 }))
               }
               onChange={(e) => verificarTitular(e)}
-              // onChangeText={(e) => verificarTitular(e)}
             />
             {titular.length < 1 ? null : titularVerify ? null : (
               <Text style={{ color: "red", fontWeight: "bold" }}>
@@ -218,8 +237,6 @@ export default function CadastrarCartao() {
             <TextInput
               style={styles.input}
               keyboardType="numeric"
-              onChangeText={handleCardNumberChange}
-              value={numberCard}
               placeholder="NÚMERO DO CARTÃO"
               onFocus={() =>
                 (rotation.value = withTiming(180, { duration: 500 }))
@@ -233,30 +250,33 @@ export default function CadastrarCartao() {
             )}
             <View style={styles.row}>
               <TextInput
-                style={[styles.input, styles.halfInput]}
+                style={[styles.input, styles.halfInput, validade.length < 1 ? null : validadeVerify ? null : {borderWidth: 2, borderColor: 'red'}]}
                 keyboardType="numeric"
-                onChangeText={handleValidadeChange}
-                value={validaade}
                 placeholder="VALIDADE"
+                maxLength={4}
                 onFocus={() =>
                   (rotation.value = withTiming(180, { duration: 500 }))
                 }
+                onChange={(e) => verificarValidade(e)}
               />
               <TextInput
-                style={[styles.input, styles.halfInput]}
+                style={[styles.input, styles.halfInput, cvv.length < 1 ? null : cvvVerify ? null : {borderWidth: 2, borderColor: 'red'}]}
                 keyboardType="numeric"
-                onChangeText={handleCVVChange}
-                value={cvv}
-                maxLength={3}
+                maxLength={bandeiraCartao === "amex" ? 4 : 3}
                 placeholder="CVV"
                 onFocus={() =>
                   (rotation.value = withTiming(180, { duration: 500 }))
                 }
+                onChange={(e) => verificarCvv(e)}
               />
             </View>
             <TouchableOpacity
               style={{ marginTop: 50 }}
               onPress={() => {
+                console.log("TITULAR: " + titular);
+                console.log("NÚMERO: " + numberCard);
+                console.log("VALIDADE: " + validade);
+                console.log("CVV: " + cvv);
                 // navigation.navigate("CadastrarCarro");
               }}
             >
@@ -266,7 +286,7 @@ export default function CadastrarCartao() {
             </TouchableOpacity>
           </View>
         </View>
-      </KeyboardAwareScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -286,7 +306,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   cardWrapper: {
-    // margin: 60,
     marginBottom: 20,
     position: "relative",
     width: "100%",
@@ -311,13 +330,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     flexDirection: "row",
-  },
-  red: {
-    backgroundColor: "red",
-  },
-  orange: {
-    backgroundColor: "orange",
-    marginLeft: -8,
   },
   label: {
     fontWeight: "bold",
